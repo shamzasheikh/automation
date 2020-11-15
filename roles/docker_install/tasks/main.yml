@@ -1,0 +1,52 @@
+- name: install docker dependency
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - yum-utils 
+   - device-mapper-persistent-data 
+   - lvm2
+
+- name: Adding repo
+  shell: sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: Installing docker
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - containerd.io-1.2.13 
+  - docker-ce-19.03.11 
+  - docker-ce-cli-19.03.11
+
+- name: Create Docker directory
+  file:
+    path: "/etc/docker"
+    state: directory
+
+- name: Copy daemon.jason
+  template:
+    src: "docker.service.j2"
+    dest: /etc/docker/daemon.json
+
+- name: Create Docker directory
+  file:
+    path: "/etc/systemd/system/docker.service.d"
+    state: directory
+    recurse: yes
+
+- name: Just force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and restart docker
+  systemd: 
+    name: docker 
+    state: restarted
+    enabled: yes

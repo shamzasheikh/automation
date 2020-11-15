@@ -1,0 +1,3 @@
+- name: Join to Kubernetes cluster
+  shell: kubeadm join {{ apiserver_advertise_address }}:6443 --token {{ token }} --discovery-token-ca-cert-hash {{ discovery_token_ca_cert_hash }}
+  register: join_cluster

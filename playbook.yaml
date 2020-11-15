@@ -1,0 +1,31 @@
+---
+- name: Prerequisites and dependency setup
+  hosts: allservers
+  vars_files:
+   - allservers.yaml
+  gather_facts: yes
+  become: yes
+  roles:
+  - prerequisites
+  - install_dependencies
+  - docker_install
+
+
+- name: Controlplane setup
+  hosts: controlplane
+  vars_files:
+   - allservers.yaml
+  gather_facts: yes
+  become: yes
+  roles:
+  - initialize_controlplane
+
+
+- name: Join worker nodes to controlplane
+  hosts: workers
+  vars_files:
+   - allservers.yaml
+  gather_facts: yes
+  become: yes
+  roles:
+  - join_workers

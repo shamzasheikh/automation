@@ -1,0 +1,8 @@
+[allservers]
+10.128.0.8
+
+[controlplane]
+10.128.0.8
+
+[workers]
+10.128.0.8

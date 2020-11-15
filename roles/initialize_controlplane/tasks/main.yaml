@@ -1,0 +1,51 @@
+- name: Reset Kubernetes component
+  shell: "kubeadm reset --force"
+  ignore_errors: True
+  register: reset_cluster
+
+- name: initialize controlplane
+  when: reset_cluster is succeeded
+  shell: kubeadm init --pod-network-cidr {{ pod_network_cidr }} --apiserver-advertise-address={{ apiserver_advertise_address }}
+  register: init_cluster
+
+- name: Create Kubernetes config directory
+  file:
+    path: ".kube/"
+    state: directory
+
+- name: Copy admin.conf to Home directory
+  when: init_cluster is succeeded
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ".kube/config"
+    owner: "{{ host_user }}"
+    group: "{{ host_user }}"
+    mode: 0755
+    remote_src: true
+
+- name: get kubectl version
+  shell: kubectl version | base64 | tr -d '\n'
+  register: kubeletv
+ 
+- name: Deploy network solution 
+  shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version={{ kubeletv }}"
+
+- name: print join command
+  debug:
+    msg: "{{ init_cluster.stdout_lines }}"
+  #register: list1
+
+#- name: print join command
+ # debug:
+  #  msg: "{{ init_cluster.stdout_lines[65] }}" 
+  #register: list1
+
+#- name: print join command two
+#  debug:
+#    msg: "{{ init_cluster.stdout_lines[66] }}"
+#  register: list2
+
+#- name: combine2
+  #debug:
+ #   msg: "The join cmmand is: {{ list1 }}"
+#

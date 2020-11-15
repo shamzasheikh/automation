@@ -1,0 +1,25 @@
+- name: Ensure Kubernetes repository exists
+  yum_repository:
+      name: kubernetes
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+      description: Kubernetes repository
+      enabled: yes
+      gpgcheck: yes
+      repo_gpgcheck: yes
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      exclude: 
+        kubelet kubeadm kubectl 
+
+- name: install kubelet kubeadm kubectl 
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - kubelet 
+  - kubeadm 
+  - kubectl
+
+- name: enable kubelet
+  systemd: 
+    name: kubelet 
+    enabled: yes
