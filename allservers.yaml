@@ -1,3 +1,9 @@
+# Please update below variables as per your environment and requirement.
+
 pod_network_cidr: 10.244.0.0/16
+
+# Stattic IP of controlplane node
 apiserver_advertise_address: 10.128.0.8
+
+# User for taking ownership of /.kube/config
 host_user: shamza
